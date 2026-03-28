@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>xslt-mcp-server</AssemblyName>
+    <RootNamespace>XsltMcpServer</RootNamespace>
+    <Description>MCP server providing XSLT spec reference lookup and XSLT/XPath execution</Description>
+    <Version>1.0.0</Version>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>xslt-mcp</ToolCommandName>
+    <PackageId>xslt-mcp</PackageId>
+    <PackageTags>xslt;mcp;model-context-protocol;xml;spec;ai</PackageTags>
+    <RepositoryUrl>https://github.com/phoenixmldb/xslt-mcp</RepositoryUrl>
+    <NoWarn>$(NoWarn);CA1303;CA2007</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ModelContextProtocol" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" />
+    <PackageReference Include="PhoenixmlDb.Xslt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="../spec/concepts/**/*.md" />
+    <EmbeddedResource Include="../spec/error-codes/**/*.md" />
+    <EmbeddedResource Include="../spec/instructions/**/*.md" />
+    <EmbeddedResource Include="../spec/output-methods/**/*.md" />
+    <EmbeddedResource Include="../spec/xpath/**/*.md" />
+  </ItemGroup>
+
+</Project>
