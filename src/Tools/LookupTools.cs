@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Text;
+using System.Text.Json;
 using ModelContextProtocol.Server;
 
 namespace XsltMcpServer.Tools;
@@ -165,6 +166,72 @@ public static class LookupTools
         }
 
         return sb.ToString();
+    }
+
+    [McpServerTool(Name = "xslt_compare_versions"), Description(
+        "For a given XSLT instruction or XPath function, report which spec version introduced it " +
+        "and a link to the spec. Useful for disambiguating features added in XSLT 3.0 vs earlier versions, " +
+        "and for identifying anything that is an XSLT 4.0 working-draft addition (since: \"4.0\").")]
+    public static string CompareVersions(
+        SpecIndex index,
+        [Description("Instruction or function name (e.g., 'xsl:merge', 'fn:transform', 'xsl:iterate')")] string name)
+    {
+        var entry = index.Lookup(name);
+
+        // Also try with xsl: prefix for instructions
+        if (entry == null && !name.StartsWith("xsl:", StringComparison.OrdinalIgnoreCase))
+            entry = index.Lookup("xsl:" + name);
+
+        // Also try with fn: prefix for functions
+        if (entry == null && !name.StartsWith("fn:", StringComparison.OrdinalIgnoreCase))
+            entry = index.Lookup("fn:" + name);
+
+        if (entry == null)
+            return JsonSerializer.Serialize(new
+            {
+                ok = false,
+                name,
+                message = $"No spec entry found for '{name}'. Try xslt_search or xslt_list_instructions."
+            }, XsltErrorMapper.JsonOpts);
+
+        return JsonSerializer.Serialize(new
+        {
+            ok = true,
+            name = entry.Name,
+            since = string.IsNullOrEmpty(entry.Since) ? null : entry.Since,
+            specUrl = string.IsNullOrEmpty(entry.SpecUrl) ? null : entry.SpecUrl,
+            category = string.IsNullOrEmpty(entry.Category) ? null : entry.Category
+        }, XsltErrorMapper.JsonOpts);
+    }
+
+    [McpServerTool(Name = "xslt_find_examples"), Description(
+        "Find working, curated XSLT examples for a given feature (e.g., 'xsl:merge', 'streaming', 'fn:transform'). " +
+        "Returns one or more example entries with full XSLT code, prose explanation, and common pitfalls. " +
+        "Use this BEFORE writing XSLT — examples teach idiom in a way spec prose cannot.")]
+    public static string FindExamples(
+        SpecIndex index,
+        [Description("Feature or topic name (e.g., 'xsl:merge', 'streaming', 'xsl:fork')")] string topic)
+    {
+        var examples = index.GetByCategory("example")
+            .Where(e => e.Name.Contains(topic, StringComparison.OrdinalIgnoreCase)
+                     || (e.Body ?? "").Contains(topic, StringComparison.OrdinalIgnoreCase))
+            .Select(e => new
+            {
+                name = e.Name,
+                specUrl = string.IsNullOrEmpty(e.SpecUrl) ? null : e.SpecUrl,
+                since = string.IsNullOrEmpty(e.Since) ? null : e.Since,
+                content = e.Body
+            })
+            .Take(5)
+            .ToArray();
+
+        return JsonSerializer.Serialize(new
+        {
+            ok = true,
+            topic,
+            count = examples.Length,
+            examples
+        }, XsltErrorMapper.JsonOpts);
     }
 
     /// <summary>

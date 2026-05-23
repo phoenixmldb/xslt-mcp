@@ -67,14 +67,26 @@ Add to your MCP client configuration:
 | `xslt_search` | Full-text search across all spec entries |
 | `xslt_list_instructions` | List all XSLT instructions |
 | `xslt_list_functions` | List all functions by category |
+| `xslt_compare_versions` | Report which spec version introduced an instruction or function |
+| `xslt_find_examples` | Find curated working examples by topic (xsl:merge, streaming, fn:transform, …) |
 
 ### Execution
 | Tool | Description |
 |------|-------------|
-| `xslt_transform` | Run an XSLT transformation and get the output |
-| `xslt_validate` | Compile a stylesheet without executing — check for errors |
-| `xpath_evaluate` | Evaluate an XPath expression against XML |
+| `xslt_transform` | Run an XSLT transformation — returns structured JSON with errors and source locations |
+| `xslt_validate` | Compile a stylesheet without executing — returns structured JSON errors |
+| `xpath_evaluate` | Evaluate an XPath expression against XML — returns structured JSON |
 | `xslt_explain_error` | Explain an error code with causes and fixes |
+| `xslt_compile` | Compile a stylesheet once and get a SHA256 handle for reuse |
+| `xslt_apply` | Apply a compiled handle to source XML — skips re-compilation |
+| `xslt_test` | Assertion runner — apply a stylesheet and compare output to expected XML |
+
+### Spec-Aware Analysis
+| Tool | Description |
+|------|-------------|
+| `xslt_explain_streamability` | Analyze each `xsl:mode` and `xsl:template` for streamability |
+| `xslt_suggest_fix` | Given an error code, return a spec-grounded actionable suggestion |
+| `server_capabilities` | Report engine version, spec coverage, and the complete tool list |
 
 ### Utilities
 | Tool | Description |
