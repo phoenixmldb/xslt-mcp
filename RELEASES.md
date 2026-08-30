@@ -2,29 +2,39 @@
 
 ## 1.5.0 - 2026-08-30
 
-### The bundled engine is current again
+### The bundled engine is current
 
-This release does one thing: it brings the embedded XSLT engine from 1.3.21 up to 1.6.12.
-
-The server had been pinned to 1.3.21 since May while the engine kept shipping. Anyone meeting
-the engine through this server was meeting a three-month-old one, and every fix in between was
-unreachable from here even though it was published. Among what you now get:
+Brings the embedded XSLT engine to 1.6.12. The previous pin was 1.6.4, itself a recent resync
+after the server had drifted a long way behind. Among what 1.6.12 adds over 1.6.4:
 
 - Deferred global-variable initialization, so a stylesheet that imports a module declaring a
-  context-dependent global no longer fails before doing any work (Xslt 1.6.12)
-- `format-date` and `format-dateTime` accept untyped atomic input rather than raising FORG0001
-- Cross-store node handling for ancestor and path navigation
-- Namespace resolution inside nested name tests in patterns
-- The typed-template copy and construction fixes reported from the field between June and August
+  context-dependent global no longer fails before doing any work
+- The `xslt` tool no longer blocks on standard input when invoked with a named template
+- Typed-template copy and construction fixes reported from the field
 
 No changes to the server's own tools, transport, or output shapes. If you were using 1.4.0, the
 interface is identical and only the engine underneath moved.
 
+### The server now says which engine it carries
+
+`xslt-mcp --version` reports both the server version and the bundled engine, and the same line
+goes to stderr on every startup, which is where an MCP client keeps its logs:
+
+    [xslt-mcp] 1.5.0, bundling PhoenixmlDb.Xslt 1.6.12
+
+A version identifies the package, not what it carries. This server spent months behind the
+engine with nothing anywhere saying so, and the same gap once had someone inferring a stale
+engine from a repro that kept failing against a version that supposedly contained the fix.
+
+We are deliberately not putting the two packages in lockstep. That would oblige a release of this
+server on every engine patch, and it would make this version number meaningless for the server's
+own interface. Reporting what is bundled gives the same visibility without either cost.
+
 ### Why it drifted, and what changes
 
-Nothing forced a look. The engine repo released, and this repo had no reason to notice. We now
-check the pin on every engine release automatically, build, and run this server's suite against
-it, so the gap becomes visible immediately instead of after three months.
+Nothing forced a look. The engine repo released, and this repo had no reason to notice. The pin
+is now checked against every engine release automatically, with a build and a test run, so a gap
+shows up immediately rather than after months.
 
 ## 1.4.0 — 2026-05-23
 
