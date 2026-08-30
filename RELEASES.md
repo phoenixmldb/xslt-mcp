@@ -1,5 +1,31 @@
 # xslt-mcp release notes
 
+## 1.5.0 - 2026-08-30
+
+### The bundled engine is current again
+
+This release does one thing: it brings the embedded XSLT engine from 1.3.21 up to 1.6.12.
+
+The server had been pinned to 1.3.21 since May while the engine kept shipping. Anyone meeting
+the engine through this server was meeting a three-month-old one, and every fix in between was
+unreachable from here even though it was published. Among what you now get:
+
+- Deferred global-variable initialization, so a stylesheet that imports a module declaring a
+  context-dependent global no longer fails before doing any work (Xslt 1.6.12)
+- `format-date` and `format-dateTime` accept untyped atomic input rather than raising FORG0001
+- Cross-store node handling for ancestor and path navigation
+- Namespace resolution inside nested name tests in patterns
+- The typed-template copy and construction fixes reported from the field between June and August
+
+No changes to the server's own tools, transport, or output shapes. If you were using 1.4.0, the
+interface is identical and only the engine underneath moved.
+
+### Why it drifted, and what changes
+
+Nothing forced a look. The engine repo released, and this repo had no reason to notice. We now
+check the pin on every engine release automatically, build, and run this server's suite against
+it, so the gap becomes visible immediately instead of after three months.
+
 ## 1.4.0 — 2026-05-23
 
 Major release combining four shippable phases of work. Consumers upgrading from 1.0.1 will see all of these features at once.
